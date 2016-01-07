@@ -207,30 +207,6 @@ git_masterstage() {
   echo "Successfully deployed '$1' from '${GIT_URL}' to '${MASTERDIR}' on $(date)"
 }
 
-git_branch_masterstage() {
-  set_staging_dir_from_params
-  check_git_installed
-  git_setup_local_mirrored_repo
-  git_stage_refspec "${GIT_BRANCH}"
-  validate_staged_policy
-  avoid_triggering_unneeded_policy_updates
-  rollout_staged_policy_to_masterdir
-
-  echo "Successfully deployed branch '${GIT_BRANCH}' from '${GIT_URL}' to '${MASTERDIR}' on $(date)"
-}
-
-git_tag_or_commit_masterstage() {
-  set_staging_dir_from_params
-  check_git_installed
-  git_setup_local_mirrored_repo
-  git_stage_refspec "${GIT_TAG_OR_COMMIT}"
-  validate_staged_policy
-  avoid_triggering_unneeded_policy_updates
-  rollout_staged_policy_to_masterdir
-
-  echo "Successfully deployed commit '${GIT_TAG_OR_COMMIT}' from '${GIT_URL}' to '${MASTERDIR}' on $(date)"
-}
-
 svn_branch() {
 # Contributed by John Farrar
 
