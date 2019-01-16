@@ -1,3 +1,3 @@
 #!/bin/jq -f
 
-.bundles[]|{bundle: .name,file: .sourcePath,toBeFiltered: (.promiseTypes[]|select(.name == "meta")|.contexts[]|{context: .name,promises: .promises[]})}|{bundle,file,context: .toBeFiltered.context,promiser: .toBeFiltered.promises.promiser,metacomment: (.toBeFiltered.promises.attributes[]|select(.lval == "string")|.rval.value),linenumber: (.toBeFiltered.promises.attributes[]|select(.lval == "string")|.line)}
+.bundles[]|{bundle: .name,file: .sourcePath} + (.promiseTypes[]|select(.name == "meta")|.contexts[]|{context: .name} + (.promises[]|{promiser} + (.attributes[]|select(.lval == "string")|{metacomment: .rval.value,linenumber: .line})))
