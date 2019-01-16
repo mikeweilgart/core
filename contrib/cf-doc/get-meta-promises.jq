@@ -17,3 +17,4 @@
       )
     )
   )
+| {file,linenumber,bundle,context,promiser,metacomment}
