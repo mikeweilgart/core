@@ -5,6 +5,19 @@
 
 url_prefix=https://example.com/cfengine/masterfiles/blob/
 
+collection='
+{
+  "metapromisers": {
+    "inventory": "Inventory",
+    "config": "Configuration"
+  },
+  "metatags": {
+    "docinv": "Inventory",
+    "docconfig": "Configuration"
+  }
+}
+'
+
 usage() {
 cat >&2 <<EOF
 SYNOPSIS
@@ -23,7 +36,10 @@ DESCRIPTION
 
         cf-promises is used internally to parse CFEngine policy and
         generate json output, which is further parsed to produce
-        the above output.
+        the script output.
+
+        The particular meta tags and meta promises to be collected
+        are as defined in the "collection" variable in this script.
 
 OPTIONS
         -f FILE         The CFEngine policy file to begin with for
