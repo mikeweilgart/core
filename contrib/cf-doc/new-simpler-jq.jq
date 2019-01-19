@@ -1,4 +1,72 @@
 #!/bin/jq -f
+#
+# Author: Mike Weilgart
+# Date: 18 January 2019
+# Purpose: This is a supporting script for cf-doc.sh
+#
+# Its input should be the output of cf-promises with
+# argument '-p json-full'.  Also it expects to have
+# a variable called "collection" (jq variable) defined prior
+# to running.  The collection variable should be defined
+# as a json object with two keys, "metapromisers" and
+# "metatags".
+#
+# Here is an example:
+#
+#   cf-promises -p json-full |
+#   jq --argjson collection '
+#   {
+#     "metapromisers": {
+#       "inventory": "Inventory",
+#       "config": "Configuration"
+#     },
+#     "metatags": {
+#       "docinv": "Inventory",
+#       "docconfig": "Configuration"
+#     }
+#   }
+#   ' -f thisscript
+#
+# The final output is a JSON object with (potentially)
+# as many keys as the number of distinct innermost values
+# in the "collection" variable - so in the above example,
+# the top level output keys are "Inventory" and "Configuration".
+#
+# The value for each output key is an array of objects,
+# each with three keys: "file", "linenumber" and "text".
+#
+# The first two are self explanatory; together they refer to
+# an exact line of CFEngine policy.
+#
+# "text" refers to the string attribute of a meta promise,
+# OR the right hand side of a meta tag.  For example, with
+# the above value for the collection variable, information
+# for the docs could be written as a meta promise like so:
+#
+#   meta:
+#     context_is_ignored::
+#       "config"
+#         string => "Line of text to go in the doc";
+#
+# OR, equivalently:
+#
+#   files: # Or any promise type
+#     context_still_ignored::
+#       "/promiser/does/not/matter"
+#         meta => { "docconfig=Line of text to go in the doc" },
+#         create => "true"; # Only the meta tag matters
+#
+# Either one of these will produce an output object like so:
+#
+#   {
+#     "Configuration": [
+#       {
+#         "file": "/var/cfengine/inputs/path/to/policy.cf",
+#         "linenumber": 42,
+#         "text": "Line of text to go in the doc"
+#       }
+#     ]
+#   }
 
 [
   .bundles[]
@@ -43,4 +111,5 @@
     )
 ]
 | group_by(.category)[]
+# Hat tip to https://stackoverflow.com/a/43221520/5419599
 | {(.[0].category): [.[]|del(.category)]}
