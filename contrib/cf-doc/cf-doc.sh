@@ -36,7 +36,7 @@ OPTIONS
 
         -u URL          URL prefix to use for all links.  Default is
                         coded into the script at the top and is intended
-                        for modification to suit your site, but can
+                        for modification to suit your site, but can also
                         be overridden on the command line with -u.
                         Current default is $url_prefix
 
