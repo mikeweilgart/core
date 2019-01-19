@@ -8,7 +8,7 @@
 #
 #   cat input.json |
 #   jq --arg url_prefix "https://example.com/cfengine/masterfiles/blob/" \
-#     --arg version "master" -r -f thisscript
+#     --arg policy_version "master" -r -f thisscript
 
 "\n# " + .header
 ,
@@ -17,7 +17,7 @@
   + .text
   + "]("
   + $url_prefix
-  + $version
+  + $policy_version
   + "/"
   + .file
   + "#L"
