@@ -45,3 +45,5 @@ OPTIONS
                         be markdown formatted as URLs.
 EOF
 }
+
+[ "$1" = --help ] && { usage; exit 0;}
