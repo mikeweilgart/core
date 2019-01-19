@@ -3,6 +3,7 @@
 # Date: 18 January 2019
 # Purpose: Extract summary documentation from specially prepared CFEngine policy.
 
+# url_prefix should have a trailing slash
 url_prefix=https://example.com/cfengine/masterfiles/blob/
 
 collection='
@@ -18,11 +19,14 @@ collection='
 }
 '
 
+########################################################################
+#                      USAGE MESSAGE                                   #
+########################################################################
 usage() {
 cat >&2 <<EOF
 SYNOPSIS
         cf-doc --help
-        cf-doc [-f FILE] [-v VERSION] [-u URL] [-t]
+        cf-doc [-f FILE] [-p VERSION] [-u URL] [-t]
 
 DESCRIPTION
         cf-doc will extract particular meta tags and meta promises
@@ -36,7 +40,7 @@ DESCRIPTION
 
         cf-promises is used internally to parse CFEngine policy and
         generate json output, which is further parsed to produce
-        the script output.
+        the final script output.
 
         The particular meta tags and meta promises to be collected
         are as defined in the "collection" variable in this script.
@@ -47,7 +51,7 @@ OPTIONS
                         Default is none, so the cf-promises default
                         applies of /var/cfengine/inputs/promises.cf
 
-        -v VERSION      Version of the policy that is being checked,
+        -p VERSION      Version of the policy that is being checked,
                         for inclusion in the URL.  Default is master.
 
         -u URL          URL prefix to use for all links.  Default is
@@ -62,4 +66,41 @@ OPTIONS
 EOF
 }
 
+########################################################################
+#                     OPTIONS HANDLING                                 #
+########################################################################
 [ "$1" = --help ] && { usage; exit 0;}
+
+filewaspassed=''
+policy_version=master
+# url_prefix is set at the top for easy customization by users
+textonly=''
+
+while getopts :f:p:u:t opt; do
+  case "$opt" in
+    f)
+      filewaspassed='non-empty string for boolean true'
+      file="${OPTARG}"
+      ;;
+    p)
+      policy_version="${OPTARG}"
+      ;;
+    u)
+      url_prefix="${OPTARG}"
+      ;;
+    t)
+      textonly='non-empty string for boolean true'
+      ;;
+    :)
+      printf 'Option -%s requires an argument\n' "$OPTARG" >&2
+      usage
+      exit 1
+      ;;
+    *)
+      printf 'Invalid option: -%s\n' "$OPTARG" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+shift "$((OPTIND-1))"
