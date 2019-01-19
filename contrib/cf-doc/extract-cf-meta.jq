@@ -79,15 +79,13 @@
     +
     (.promiseTypes[]
     | select(.name == "meta")
-    | .contexts[]
-    | (.promises[]
-      | select(.promiser|in($collection.metapromisers))
-      | {category: $collection.metapromisers[.promiser]}
-        +
-        (.attributes[]
-        | select(.lval == "string")
-        | {linenumber: .line,text: .rval.value }
-        )
+    | .contexts[].promises[]
+    | select(.promiser|in($collection.metapromisers))
+    | {category: $collection.metapromisers[.promiser]}
+      +
+      (.attributes[]
+      | select(.lval == "string")
+      | {linenumber: .line,text: .rval.value }
       )
     )
 ]
