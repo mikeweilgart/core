@@ -96,22 +96,16 @@
   .bundles[]
   | {file: .sourcePath}
     +
-    (.promiseTypes[]
-    | (.contexts[]
-      | (.promises[]
-        | (.attributes[]
-          | select(.lval == "meta")
-          | {linenumber: .line}
-            +
-            (.rval.value[].value
-            | split("=")
-            | select(.[0]|in($collection.metatags))
-            | {category: $collection.metatags[.[0]]}
-              +
-              {text: .[1]}
-            )
-          )
-        )
+    (.promiseTypes[].contexts[].promises[].attributes[]
+    | select(.lval == "meta")
+    | {linenumber: .line}
+      +
+      (.rval.value[].value
+      | split("=")
+      | select(.[0]|in($collection.metatags))
+      | {category: $collection.metatags[.[0]]}
+        +
+        {text: .[1]}
       )
     )
 ]
