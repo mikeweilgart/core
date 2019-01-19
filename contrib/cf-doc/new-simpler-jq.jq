@@ -27,12 +27,16 @@
 #   }
 #   ' -f thisscript
 #
-# The final output is a JSON object with (potentially)
-# as many keys as the number of distinct innermost values
-# in the "collection" variable - so in the above example,
-# the top level output keys are "Inventory" and "Configuration".
+# The final output is (potentially) a JSON object for each
+# distinct innermost value in the "collection" variable.
 #
-# The value for each output key is an array of objects,
+# Each of these values becomes a "header" value in its own
+# output object.  So in the above example, there would be
+# two output objects, one with a "header" value of "Inventory"
+# and the other with a "header" value of "Configuration".
+#
+# The output JSON objects have only two keys: "header" and "info".
+# The value for the "info" key is an array of objects,
 # each with three keys: "file", "linenumber" and "text".
 #
 # The first two are self explanatory; together they refer to
@@ -59,7 +63,8 @@
 # Either one of these will produce an output object like so:
 #
 #   {
-#     "Configuration": [
+#     "header": "Configuration",
+#     "info": [
 #       {
 #         "file": "/var/cfengine/inputs/path/to/policy.cf",
 #         "linenumber": 42,
@@ -112,4 +117,4 @@
 ]
 | group_by(.category)[]
 # Hat tip to https://stackoverflow.com/a/43221520/5419599
-| {(.[0].category): [.[]|del(.category)]}
+| {header: (.[0].category),info: [.[]|del(.category)]}
