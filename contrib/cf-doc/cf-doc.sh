@@ -44,6 +44,8 @@ DESCRIPTION
 
         The particular meta tags and meta promises to be collected
         are as defined in the "collection" variable in this script.
+        For further details on this see the inline documentation
+        in the supporting script 'extract-cf-meta.jq'.
 
 OPTIONS
         -f FILE         The CFEngine policy file to begin with for
