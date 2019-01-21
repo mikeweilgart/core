@@ -48,10 +48,9 @@ DESCRIPTION
         in the supporting script 'extract-cf-meta.jq'.
 
 OPTIONS
-        -f FILE         The CFEngine policy file to begin with for
-                        parsing.  This is passed to cf-promises.
-                        Default is none, so the cf-promises default
-                        applies of /var/cfengine/inputs/promises.cf
+        -f FILE         File to pass to cf-promises for parsing.
+                        If not specified cf-promises will use its own
+                        default of /var/cfengine/inputs/promises.cf
 
         -p VERSION      Version of the policy that is being checked,
                         for inclusion in the URL.  Default is master.
