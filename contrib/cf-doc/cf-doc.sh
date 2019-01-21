@@ -73,7 +73,7 @@ EOF
 ########################################################################
 [ "$1" = --help ] && { usage; exit 0;}
 
-filewaspassed=''
+filepassed=''
 policy_version=master
 # url_prefix is set at the top for easy customization by users
 textonly=''
@@ -81,8 +81,14 @@ textonly=''
 while getopts :f:p:u:t opt; do
   case "$opt" in
     f)
-      filewaspassed='non-empty string for boolean true'
-      file="${OPTARG}"
+      filepassed="${OPTARG}"
+      # Known bug/unexpected behavior: if you call the script with -f ''
+      # it will act as though the -f flag and its argument were omitted
+      # entirely rather than throw an error, so cf-promises will be run
+      # without any -f flag.  For interactive use this shouldn't matter
+      # but if you're scripting something around cf-doc then be sure to
+      # check any variable you pass to the -f flag if you care about
+      # reporting an error for an empty string argument.
       ;;
     p)
       policy_version="${OPTARG}"
@@ -106,3 +112,36 @@ while getopts :f:p:u:t opt; do
   esac
 done
 shift "$((OPTIND-1))"
+
+########################################################################
+#                     MAIN ACTION                                      #
+########################################################################
+
+# Allow proper building of the link e.g. for GitLab
+# We only need this if we're generating markdown
+if [ "$textonly" ]; then
+  :
+else
+  if [ "$filepassed" ]; then # there was a file passed
+    # If the file passed has a slash then use the dirname,
+    # otherwise cf-promises will default to /var/cfengine/inputs/
+    # to find the file passed, so we'll use that.
+    if [ "${filepassed%/*}" = "$filepassed" ]; then # no slash
+      trimstring='/var/cfengine/inputs/'
+    else
+      trimstring="$(dirname "$filepassed")/"
+    fi
+  else # no file passed, use fallback dir
+    trimstring='/var/cfengine/inputs/'
+  fi
+fi
+
+thisdir="$(dirname "$0")"
+
+cf-promises -p json-full ${filepassed:+-f "$filepassed"} |
+  jq --argjson collection "$collection" -f "$thisdir"/extract-cf-meta.jq |
+  if [ "$textonly" ]; then
+    jq -r '"\n# " + .header , (.info[] | "- " + .text)'
+  else
+    jq --arg url_prefix "$url_prefix" --arg policy_version "$policy_version" --arg trimstring "$trimstring" -rf "$thisdir"/format-cf-markdown.jq
+  fi

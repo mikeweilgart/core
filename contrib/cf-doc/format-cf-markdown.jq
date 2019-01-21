@@ -19,7 +19,7 @@
   + $url_prefix
   + $policy_version
   + "/"
-  + .file
+  + (.file|ltrimstr($trimstring))
   + "#L"
   + (.linenumber|tostring)
   + ")"
