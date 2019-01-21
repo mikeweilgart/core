@@ -72,7 +72,7 @@ EOF
 ########################################################################
 [ "$1" = --help ] && { usage; exit 0;}
 
-filepassed=''
+unset filepassed
 policy_version=master
 # url_prefix is set at the top for easy customization by users
 textonly=''
@@ -81,13 +81,6 @@ while getopts :f:p:u:t opt; do
   case "$opt" in
     f)
       filepassed="${OPTARG}"
-      # Known bug/unexpected behavior: if you call the script with -f ''
-      # it will act as though the -f flag and its argument were omitted
-      # entirely rather than throw an error, so cf-promises will be run
-      # without any -f flag.  For interactive use this shouldn't matter
-      # but if you're scripting something around cf-doc then be sure to
-      # check any variable you pass to the -f flag if you care about
-      # reporting an error for an empty string argument.
       ;;
     p)
       policy_version="${OPTARG}"
@@ -121,7 +114,7 @@ thisdir="$(dirname "$0")"
 # Take note the rest of the script is ONE pipeline.
 
 # Generation
-cf-promises -p json-full ${filepassed:+-f "$filepassed"} |
+cf-promises -p json-full ${filepassed+-f "$filepassed"} |
 
   # Extraction
   jq --argjson collection "$collection" -f "$thisdir"/extract-cf-meta.jq |
