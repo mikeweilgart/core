@@ -31,7 +31,8 @@ SYNOPSIS
 DESCRIPTION
         cf-doc will extract particular meta tags and meta promises
         from CFEngine policy and will output a list of them in
-        Markdown format.
+        Markdown format, to document and index a codebase of
+        CFEngine policy.
 
         Each line of output is formatted as a URL linking back
         to the line of policy from which it was extracted.
