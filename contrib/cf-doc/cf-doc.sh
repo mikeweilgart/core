@@ -117,31 +117,28 @@ shift "$((OPTIND-1))"
 #                     MAIN ACTION                                      #
 ########################################################################
 
-# Allow proper building of the link e.g. for GitLab
-# We only need this if we're generating markdown
-if [ "$textonly" ]; then
-  :
-else
-  if [ "$filepassed" ]; then # there was a file passed
-    # If the file passed has a slash then use the dirname,
-    # otherwise cf-promises will default to /var/cfengine/inputs/
-    # to find the file passed, so we'll use that.
-    if [ "${filepassed%/*}" = "$filepassed" ]; then # no slash
-      trimstring='/var/cfengine/inputs/'
-    else
-      trimstring="$(dirname "$filepassed")/"
-    fi
-  else # no file passed, use fallback dir
-    trimstring='/var/cfengine/inputs/'
-  fi
-fi
-
 thisdir="$(dirname "$0")"
 
+# Generation
 cf-promises -p json-full ${filepassed:+-f "$filepassed"} |
+
+  # Extraction
   jq --argjson collection "$collection" -f "$thisdir"/extract-cf-meta.jq |
+
+  # Formatting
   if [ "$textonly" ]; then
+    # Omit links from the output, just show the text of the various meta info
     jq -r '"\n# " + .header , (.info[] | "- " + .text)'
   else
+    # Proper URLs for e.g. GitLab will need the prefix stripped from
+    # the file paths that cf-promises will output, so let's clean those up
+    if [ "${filepassed%/*}" = "$filepassed" ]; then
+      # No slash in the filepassed, or no file passed at all
+      # Either way we use the same default as cf-promises
+      trimstring='/var/cfengine/inputs/'
+    else
+      # If an explicit file was passed, we use its prefix to trim cf-promise output
+      trimstring="$(dirname "$filepassed")/"
+    fi
     jq --arg url_prefix "$url_prefix" --arg policy_version "$policy_version" --arg trimstring "$trimstring" -rf "$thisdir"/format-cf-markdown.jq
   fi
